@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const fs = require('fs')
 const path = require('path')
 const { spawn } = require('child_process')
 const { rateLimit } = require('express-rate-limit')
@@ -16,6 +17,12 @@ const predictRateLimit = rateLimit({
 
 app.use(cors())
 app.use(express.json())
+
+const publicDir = path.join(__dirname, 'public')
+const hasFrontendBuild = fs.existsSync(publicDir)
+if (hasFrontendBuild) {
+  app.use(express.static(publicDir))
+}
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })
@@ -58,6 +65,16 @@ app.post('/api/predict', predictRateLimit, (req, res) => {
   pythonProcess.stdin.write(text)
   pythonProcess.stdin.end()
 })
+
+if (hasFrontendBuild) {
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ error: 'Ruta no encontrada.' })
+    }
+
+    return res.sendFile(path.join(publicDir, 'index.html'))
+  })
+}
 
 app.listen(port, () => {
   console.log(`Backend escuchando en http://localhost:${port}`)

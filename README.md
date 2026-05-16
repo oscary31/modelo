@@ -64,3 +64,40 @@ Para detener y borrar contenedores:
 docker compose down
 ```
 
+## Ejecutar el modelo sin Docker Compose
+
+Estos comandos replican los servicios `model-downloader` y `llama` con `docker run`.
+
+1) Crear el volumen y descargar el modelo:
+
+```bash
+docker volume create llama_models
+docker run --rm -v llama_models:/models alpine:latest sh -c "apk add --no-cache wget && mkdir -p /models && if [ ! -f /models/Qwen_Qwen3-4B-Q4_K_M.gguf ]; then echo 'Downloading model from Hugging Face...'; wget -q --show-progress -O /models/Qwen_Qwen3-4B-Q4_K_M.gguf 'https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf'; else echo 'Model already exists, skipping download.'; fi"
+```
+
+2) Levantar el servidor del modelo:
+
+```bash
+docker run --rm -p 8080:8080 -v llama_models:/models:ro ghcr.io/ggml-org/llama.cpp:server -m /models/Qwen_Qwen3-4B-Q4_K_M.gguf --host 0.0.0.0 --port 8080
+```
+
+Si quieres dejarlo en background, agrega `-d` al comando anterior.
+
+## Dockerfile unificado (multistage)
+
+Se incluyo un `Dockerfile` en la raiz que ahora tambien levanta `llama.cpp` y descarga el modelo si no existe. Es util para Railway cuando necesitas un solo servicio.
+
+Variables utiles:
+
+- `MODEL_URL`: URL del modelo GGUF.
+- `MODEL_DIR`: carpeta donde se guarda el modelo (default `/models`).
+- `MODEL_FILE`: nombre del archivo del modelo.
+- `MODEL_API_URL`: URL usada por el backend para llamar a `llama.cpp`.
+
+Ejemplo (una sola imagen):
+
+```bash
+docker build -t modelo-monolith .
+docker run -p 3001:3001 -p 8080:8080 -v llama_models:/models modelo-monolith
+```
+
