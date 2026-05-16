@@ -19,14 +19,13 @@ WORKDIR /app
 
 # Install node 22 + python (llama.cpp image is Debian/Ubuntu based)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl ca-certificates python3 python3-pip wget && \
+    apt-get install -y --no-install-recommends curl ca-certificates python3 python3-pip python3-requests wget && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=backend-builder /app/backend ./backend
 COPY --from=frontend-builder /app/frontend/dist ./backend/public
-RUN pip3 install --no-cache-dir requests
 
 # Script that downloads the model (if needed) and starts llama + backend
 COPY start.sh /app/start.sh
