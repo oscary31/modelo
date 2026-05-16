@@ -43,6 +43,6 @@ ENV MODEL_URL=https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4
 ENV MODEL_API_URL=http://127.0.0.1:8080/v1/chat/completions
 ENV PORT=3001
 
-VOLUME ["/models"]
+#VOLUME ["/models"]
 EXPOSE 3001 8080
 CMD ["/app/start.sh"]
