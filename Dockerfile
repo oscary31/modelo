@@ -13,18 +13,17 @@ COPY backend/package*.json ./backend/
 RUN cd backend && npm install
 COPY backend/ ./backend/
 
-# 3. Get llama-server from official image
-FROM ghcr.io/ggml-org/llama.cpp:server AS llama-base
-
-# 4. Final image: node + llama.cpp
+# 3. Final image: node + llama.cpp
 FROM node:22-alpine
 WORKDIR /app
 
 # Install python + other deps
 RUN apk add --no-cache python3 py3-pip py3-requests wget bash curl
 
-# Download llama-server binary
-RUN wget -q https://github.com/ggml-org/llama.cpp/releases/download/b4038/llama-server-b4038-linux-x64 -O /usr/local/bin/llama-server && \
+# Download and extract llama.cpp binaries
+RUN wget -q https://github.com/ggml-org/llama.cpp/releases/download/b9033/llama-b9033-bin-ubuntu-x64.tar.gz -O /tmp/llama.tar.gz && \
+    tar -xzf /tmp/llama.tar.gz -C /usr/local/bin --strip-components=1 && \
+    rm /tmp/llama.tar.gz && \
     chmod +x /usr/local/bin/llama-server
 
 COPY --from=backend-builder /app/backend ./backend
