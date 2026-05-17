@@ -38,4 +38,4 @@ ENV PORT=3001
 
 #VOLUME ["/models"]
 EXPOSE 3001 8080
-CMD ["node", "/app/start.js"]
+CMD ["/usr/bin/node", "/app/start.js"]
