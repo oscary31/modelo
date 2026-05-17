@@ -13,21 +13,21 @@ COPY backend/package*.json ./backend/
 RUN cd backend && npm install
 COPY backend/ ./backend/
 
-# 3. Final image: llama.cpp server + backend + frontend
-FROM ghcr.io/ggml-org/llama.cpp:server
+# 3. Get llama-server from official image
+FROM ghcr.io/ggml-org/llama.cpp:server AS llama-base
+
+# 4. Final image: node + llama.cpp
+FROM node:22-alpine
 WORKDIR /app
 
-# Install node 22 + python (llama.cpp image is Debian/Ubuntu based)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl ca-certificates python3 python3-pip python3-requests wget bash && \
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y --no-install-recommends nodejs && \
-    rm -rf /var/lib/apt/lists/*
+# Install python + other deps
+RUN apk add --no-cache python3 py3-pip py3-requests wget bash curl
+
+# Copy llama-server binary from official image
+COPY --from=llama-base /app/llama-server /usr/local/bin/llama-server
 
 COPY --from=backend-builder /app/backend ./backend
 COPY --from=frontend-builder /app/frontend/dist ./backend/public
-
-# Script that downloads the model (if needed) and starts llama + backend
 COPY start.js /app/start.js
 
 ENV MODEL_DIR=/models
@@ -36,6 +36,5 @@ ENV MODEL_URL=https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4
 ENV MODEL_API_URL=http://127.0.0.1:8080/v1/chat/completions
 ENV PORT=3001
 
-#VOLUME ["/models"]
 EXPOSE 3001 8080
-CMD ["/usr/bin/node", "/app/start.js"]
+CMD ["node", "/app/start.js"]
