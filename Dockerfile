@@ -28,8 +28,7 @@ COPY --from=backend-builder /app/backend ./backend
 COPY --from=frontend-builder /app/frontend/dist ./backend/public
 
 # Script that downloads the model (if needed) and starts llama + backend
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+COPY start.js /app/start.js
 
 ENV MODEL_DIR=/models
 ENV MODEL_FILE=Qwen_Qwen3-4B-Q4_K_M.gguf
@@ -39,4 +38,4 @@ ENV PORT=3001
 
 #VOLUME ["/models"]
 EXPOSE 3001 8080
-CMD ["/usr/bin/bash", "-c", "/app/start.sh"]
+CMD ["node", "/app/start.js"]

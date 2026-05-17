@@ -85,7 +85,7 @@ Si quieres dejarlo en background, agrega `-d` al comando anterior.
 
 ## Dockerfile unificado (multistage)
 
-Se incluyo un `Dockerfile` en la raiz que ahora tambien levanta `llama.cpp` y descarga el modelo si no existe. Es util para Railway cuando necesitas un solo servicio.
+Se incluyo un `Dockerfile` en la raiz que ahora tambien levanta `llama.cpp` y descarga el modelo si no existe. Es util para Railway cuando necesitas un solo servicio. El arranque se hace con un script en Node para evitar depender de `sh`/`bash` en runtime.
 
 Variables utiles:
 
