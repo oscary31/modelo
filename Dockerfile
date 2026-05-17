@@ -24,8 +24,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends nodejs && \
     rm -rf /var/lib/apt/lists/*
 
-RUN which bash
-
 COPY --from=backend-builder /app/backend ./backend
 COPY --from=frontend-builder /app/frontend/dist ./backend/public
 
@@ -41,4 +39,4 @@ ENV PORT=3001
 
 #VOLUME ["/models"]
 EXPOSE 3001 8080
-CMD ["/bin/bash", "-c", "/app/start.sh"]
+CMD ["bash", "-c", "/app/start.sh"]
