@@ -38,8 +38,8 @@ async function start() {
   await ensureModel()
 
   const llama = spawn(
-    'llama-server',
-    ['-m', modelPath, '--host', '0.0.0.0', '--port', '8080'],
+    '/usr/local/bin/llama-server', 
+    ['-m', modelPath, '--host', '0.0.0.0', '--port', '8080'], 
     { stdio: 'inherit' }
   )
 

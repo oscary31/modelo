@@ -23,8 +23,9 @@ WORKDIR /app
 # Install python + other deps
 RUN apk add --no-cache python3 py3-pip py3-requests wget bash curl
 
-# Copy llama-server binary from official image
-COPY --from=llama-base /app/llama-server /usr/local/bin/llama-server
+# Download llama-server binary
+RUN wget -q https://github.com/ggml-org/llama.cpp/releases/download/b4038/llama-server-b4038-linux-x64 -O /usr/local/bin/llama-server && \
+    chmod +x /usr/local/bin/llama-server
 
 COPY --from=backend-builder /app/backend ./backend
 COPY --from=frontend-builder /app/frontend/dist ./backend/public
