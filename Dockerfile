@@ -39,4 +39,4 @@ ENV PORT=3001
 
 #VOLUME ["/models"]
 EXPOSE 3001 8080
-CMD ["bash", "-c", "/app/start.sh"]
+CMD /usr/bin/bash /app/start.sh
