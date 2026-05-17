@@ -43,7 +43,7 @@ async function start() {
     { stdio: 'inherit' }
   )
 
-  const backend = spawn('node', ['/app/backend/index.js'], {
+  const backend = spawn(process.execPath, ['/app/backend/index.js'], {
     stdio: 'inherit',
     env: process.env,
   })
